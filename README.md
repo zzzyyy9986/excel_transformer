@@ -48,6 +48,37 @@ docker compose up --build
 - Группы товаров: первая строка группы — код модели (`4990`), последующие — с префиксом `_` (`_4992`)
 - Название коллекции — в первой колонке второй строки
 
+## Деплой на сервер (production)
+
+На Ubuntu-сервере с Docker:
+
+```bash
+git clone https://github.com/zzzyyy9986/excel_transformer.git
+cd excel_transformer
+
+cp .env.prod.example .env
+# Отредактируйте .env: APP_KEY, APP_URL
+
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Приложение будет доступно на порту **80** (или `HTTP_PORT` из `.env`).
+
+| Переменная | Назначение |
+|------------|------------|
+| `APP_KEY` | Ключ Laravel (сгенерировать отдельно) |
+| `APP_URL` | Публичный URL (`http://IP` или `https://domain.com`) |
+| `VITE_API_URL` | Оставьте `/api` — nginx проксирует запросы на backend |
+
+Обновление после push:
+
+```bash
+git pull origin main
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+Данные (SQLite и загруженные файлы) хранятся в Docker volume `backend_storage`.
+
 ## Локальная разработка без Docker
 
 ```bash

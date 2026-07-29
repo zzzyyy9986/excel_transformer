@@ -7,5 +7,6 @@ frontend/dist/
 backend/database/database.sqlite
 backend/.env
 frontend/.env.development
+.env
 *.log
 .DS_Store
