@@ -1,0 +1,11 @@
+_ref_scooter_crm/
+.venv/
+backend/vendor/
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/
+backend/database/database.sqlite
+backend/.env
+frontend/.env.development
+*.log
+.DS_Store

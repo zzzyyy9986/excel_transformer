@@ -1,0 +1,136 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  color: #1a1a2e;
+  background: #f4f6fb;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #f4f6fb;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+.upload-dropzone {
+  border: 2px dashed #b8c2d9;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  background: #fff;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone--active {
+  border-color: #4f7cff;
+  background: #f8faff;
+}
+
+.upload-dropzone__icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.order-form__instruction {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.order-meta-table td {
+  vertical-align: middle;
+}
+
+.order-meta-table__label,
+.order-meta-table__sum-label {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.order-meta-table__tier {
+  min-width: 180px;
+}
+
+.order-meta-table__sum-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d5bff;
+  white-space: nowrap;
+}
+
+.order-table {
+  background: #fff;
+}
+
+.order-table__photo-col {
+  width: 130px;
+}
+
+.order-table__order-col {
+  width: 90px;
+}
+
+.order-table__photo-cell {
+  width: 130px;
+  padding: 0.5rem !important;
+  vertical-align: top;
+  background: #fafbfd;
+}
+
+.order-table__photo {
+  display: block;
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.order-table__model {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.order-table__qty-input {
+  width: 70px;
+  margin: 0 auto;
+}
+
+.order-table__description {
+  max-width: 320px;
+  min-width: 240px;
+  vertical-align: top;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.order-table__description-text {
+  white-space: pre-wrap;
+}
+
+.order-table__group-start td {
+  border-top-width: 2px;
+}
+
+.order-form__footer-sum {
+  font-size: 1.125rem;
+}
+
+@media (max-width: 992px) {
+  .order-table__photo-col,
+  .order-table__photo-cell {
+    width: 90px;
+  }
+
+  .order-table__photo {
+    max-width: 80px;
+  }
+
+  .order-table__description {
+    min-width: 180px;
+  }
+}
