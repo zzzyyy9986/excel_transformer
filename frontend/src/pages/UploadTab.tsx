@@ -68,19 +68,35 @@ export const UploadTab = observer(function UploadTab({ onUploaded }: UploadTabPr
       {templateStore.template && (
         <div className="card mt-4">
           <div className="card-body">
-            <h5 className="card-title">Текущий шаблон</h5>
-            <p className="mb-1">
-              <strong>Файл:</strong> {templateStore.template.original_name}
-            </p>
-            <p className="mb-0 text-muted small">
-              Загружен: {new Date(templateStore.template.uploaded_at).toLocaleString('ru-RU')}
-            </p>
-            {templateStore.form && (
-              <p className="mt-2 mb-0">
-                <strong>Коллекция:</strong> {templateStore.form.title} ·{' '}
-                {templateStore.form.groups.length} групп товаров
-              </p>
-            )}
+            <div className="d-flex justify-content-between align-items-start gap-3">
+              <div>
+                <h5 className="card-title">Текущий шаблон</h5>
+                <p className="mb-1">
+                  <strong>Файл:</strong> {templateStore.template.original_name}
+                </p>
+                <p className="mb-0 text-muted small">
+                  Загружен: {new Date(templateStore.template.uploaded_at).toLocaleString('ru-RU')}
+                </p>
+                {templateStore.form && (
+                  <p className="mt-2 mb-0">
+                    <strong>Коллекция:</strong> {templateStore.form.title} ·{' '}
+                    {templateStore.form.groups.length} групп товаров
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-sm"
+                disabled={templateStore.deleting}
+                onClick={() => {
+                  if (window.confirm('Удалить текущий шаблон?')) {
+                    void templateStore.deleteTemplate();
+                  }
+                }}
+              >
+                {templateStore.deleting ? 'Удаление…' : 'Удалить шаблон'}
+              </button>
+            </div>
           </div>
         </div>
       )}

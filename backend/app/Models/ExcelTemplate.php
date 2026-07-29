@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ExcelTemplate extends Model
 {
     protected $fillable = [
-        'client_id',
         'original_name',
         'storage_path',
         'parsed_data',

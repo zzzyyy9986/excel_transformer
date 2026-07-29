@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Concerns\ResolvesClientId;
 use App\Models\ExcelTemplate;
 use App\Services\ExcelTemplateService;
 use App\Services\OrderService;
@@ -11,8 +10,6 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    use ResolvesClientId;
-
     public function __construct(
         private readonly OrderService $orderService,
         private readonly ExcelTemplateService $templateService,
@@ -20,13 +17,7 @@ class OrderController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $clientId = $this->clientId($request);
-
-        if ($clientId === null) {
-            return response()->json(['message' => 'Не удалось определить браузер клиента.'], 400);
-        }
-
-        $template = $this->templateService->getForClient($clientId);
+        $template = $this->templateService->getActive();
 
         if ($template === null) {
             return response()->json(['message' => 'Сначала загрузите Excel-шаблон.'], 422);
@@ -58,17 +49,11 @@ class OrderController extends Controller
         ], 201);
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $clientId = $this->clientId($request);
-
-        if ($clientId === null) {
-            return response()->json(['orders' => []]);
-        }
-
         $orders = ExcelTemplate::query()
-            ->where('client_id', $clientId)
-            ->latest()
+            ->with(['orders' => fn ($query) => $query->latest()->limit(20)])
+            ->where('is_active', true)
             ->first()?->orders()
             ->latest()
             ->limit(20)

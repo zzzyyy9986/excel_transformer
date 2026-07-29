@@ -7,6 +7,7 @@ export class TemplateStore {
   form: ParsedForm | null = null;
   loading = false;
   uploading = false;
+  deleting = false;
   error: string | null = null;
   successMessage: string | null = null;
 
@@ -28,9 +29,9 @@ export class TemplateStore {
       runInAction(() => {
         this.applyTemplateData(data);
       });
-    } catch {
+    } catch (error: unknown) {
       runInAction(() => {
-        this.error = 'Не удалось загрузить шаблон.';
+        this.error = axiosLike(error)?.response?.data?.message ?? 'Не удалось загрузить шаблон.';
       });
     } finally {
       runInAction(() => {
@@ -63,6 +64,32 @@ export class TemplateStore {
     } finally {
       runInAction(() => {
         this.uploading = false;
+      });
+    }
+  }
+
+  public async deleteTemplate(): Promise<boolean> {
+    this.deleting = true;
+    this.error = null;
+    this.successMessage = null;
+
+    try {
+      await QueryService.deleteTemplate();
+      runInAction(() => {
+        this.template = null;
+        this.form = null;
+        this.quantities = {};
+        this.successMessage = 'Шаблон удалён.';
+      });
+      return true;
+    } catch (error: unknown) {
+      runInAction(() => {
+        this.error = axiosLike(error)?.response?.data?.message ?? 'Не удалось удалить шаблон.';
+      });
+      return false;
+    } finally {
+      runInAction(() => {
+        this.deleting = false;
       });
     }
   }

@@ -13,23 +13,22 @@ class ExcelTemplateService
         private readonly ExcelImageExtractorService $imageExtractor,
     ) {}
 
-    public function getForClient(string $clientId): ?ExcelTemplate
+    public function getActive(): ?ExcelTemplate
     {
         return ExcelTemplate::query()
-            ->where('client_id', $clientId)
+            ->where('is_active', true)
             ->latest()
             ->first();
     }
 
-    public function upload(UploadedFile $file, string $clientId): ExcelTemplate
+    public function upload(UploadedFile $file): ExcelTemplate
     {
-        $this->deleteClientTemplates($clientId);
+        $this->deleteActive();
 
         $path = $file->store('templates', 'local');
         $fullPath = Storage::disk('local')->path($path);
 
         $template = ExcelTemplate::query()->create([
-            'client_id' => $clientId,
             'original_name' => $file->getClientOriginalName(),
             'storage_path' => $path,
             'parsed_data' => [],
@@ -51,15 +50,24 @@ class ExcelTemplateService
         return $template->fresh();
     }
 
-    private function deleteClientTemplates(string $clientId): void
+    public function deleteActive(): bool
     {
-        $templates = ExcelTemplate::query()->where('client_id', $clientId)->get();
+        $template = $this->getActive();
 
-        foreach ($templates as $template) {
-            Storage::disk('local')->delete($template->storage_path);
-            Storage::disk('public')->deleteDirectory("template-images/{$template->id}");
-            $template->delete();
+        if ($template === null) {
+            return false;
         }
+
+        $this->deleteTemplate($template);
+
+        return true;
+    }
+
+    private function deleteTemplate(ExcelTemplate $template): void
+    {
+        Storage::disk('local')->delete($template->storage_path);
+        Storage::disk('public')->deleteDirectory("template-images/{$template->id}");
+        $template->delete();
     }
 
     /**
