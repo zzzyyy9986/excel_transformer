@@ -13,8 +13,8 @@ services:
       DB_DATABASE: /var/www/html/storage/app/database.sqlite
     volumes:
       - backend_storage:/var/www/html/storage
-    expose:
-      - "8000"
+    ports:
+      - "${BACKEND_PORT:-8001}:8000"
     command: >
       sh -c "mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs storage/app/public &&
              php artisan storage:link --force 2>/dev/null || true &&
@@ -30,7 +30,7 @@ services:
         VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
     ports:
-      - "${HTTP_PORT:-80}:80"
+      - "${FRONTEND_PORT:-8080}:80"
     depends_on:
       - backend
 

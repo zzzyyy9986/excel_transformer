@@ -57,18 +57,35 @@ git clone https://github.com/zzzyyy9986/excel_transformer.git
 cd excel_transformer
 
 cp .env.prod.example .env
-# Отредактируйте .env: APP_KEY, APP_URL
+# Отредактируйте .env: APP_KEY, порты, URL
 
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-Приложение будет доступно на порту **80** (или `HTTP_PORT` из `.env`).
+| Сервис | URL по умолчанию |
+|--------|------------------|
+| Frontend | http://your-server-ip:8080 |
+| Backend API | http://your-server-ip:8001/api |
 
 | Переменная | Назначение |
 |------------|------------|
 | `APP_KEY` | Ключ Laravel (сгенерировать отдельно) |
-| `APP_URL` | Публичный URL (`http://IP` или `https://domain.com`) |
-| `VITE_API_URL` | Оставьте `/api` — nginx проксирует запросы на backend |
+| `FRONTEND_PORT` | Внешний порт frontend (по умолчанию `8080`) |
+| `BACKEND_PORT` | Внешний порт backend API (по умолчанию `8001`) |
+| `APP_URL` | Публичный URL frontend (`http://IP:8080` или домен через nginx) |
+| `VITE_API_URL` | `/api` — через frontend; или полный URL backend при прямом доступе |
+
+Если на сервере уже работает nginx на `:80`, оставьте `FRONTEND_PORT=8080` и проксируйте с хоста:
+
+```nginx
+location /excel/ {
+    proxy_pass http://127.0.0.1:8080/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+}
+```
+
+После смены `VITE_API_URL` или портов пересоберите frontend: `docker compose -f docker-compose.prod.yml up -d --build`.
 
 Обновление после push:
 
