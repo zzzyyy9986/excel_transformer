@@ -13,22 +13,23 @@ class ExcelTemplateService
         private readonly ExcelImageExtractorService $imageExtractor,
     ) {}
 
-    public function getActive(): ?ExcelTemplate
+    public function getForClient(string $clientId): ?ExcelTemplate
     {
         return ExcelTemplate::query()
-            ->where('is_active', true)
+            ->where('client_id', $clientId)
             ->latest()
             ->first();
     }
 
-    public function upload(UploadedFile $file): ExcelTemplate
+    public function upload(UploadedFile $file, string $clientId): ExcelTemplate
     {
+        $this->deleteClientTemplates($clientId);
+
         $path = $file->store('templates', 'local');
         $fullPath = Storage::disk('local')->path($path);
 
-        ExcelTemplate::query()->where('is_active', true)->update(['is_active' => false]);
-
         $template = ExcelTemplate::query()->create([
+            'client_id' => $clientId,
             'original_name' => $file->getClientOriginalName(),
             'storage_path' => $path,
             'parsed_data' => [],
@@ -48,6 +49,17 @@ class ExcelTemplateService
         }
 
         return $template->fresh();
+    }
+
+    private function deleteClientTemplates(string $clientId): void
+    {
+        $templates = ExcelTemplate::query()->where('client_id', $clientId)->get();
+
+        foreach ($templates as $template) {
+            Storage::disk('local')->delete($template->storage_path);
+            Storage::disk('public')->deleteDirectory("template-images/{$template->id}");
+            $template->delete();
+        }
     }
 
     /**

@@ -1,11 +1,17 @@
 import axios from 'axios';
 import type { TemplateResponse } from '../types/api';
+import { getClientId } from '../utils/clientId';
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
     Accept: 'application/json',
   },
+});
+
+client.interceptors.request.use((config) => {
+  config.headers.set('X-Client-Id', getClientId());
+  return config;
 });
 
 export class QueryService {
