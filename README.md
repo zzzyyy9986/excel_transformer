@@ -29,6 +29,7 @@ docker compose up --build
 
 1. **Вкладка «Загрузить шаблон»** — загрузите `.xls` / `.xlsx` с колонками: модель, размер, цвет, цена, сумма, описание.
 2. **Вкладка «Заказ по шаблону»** — выберите прайс-уровень, укажите количество в колонке «Заказ», отправьте заказ.
+3. **Вкладка «Заказы»** — список оформленных заказов с позициями.
 
 Пример шаблона: `samples/diora_a.xls`
 
@@ -75,17 +76,29 @@ docker compose -f docker-compose.prod.yml up -d --build
 | `APP_URL` | Публичный URL frontend (`http://IP:8080` или домен через nginx) |
 | `VITE_API_URL` | `/api` — через frontend; или полный URL backend при прямом доступе |
 
-Если на сервере уже работает nginx на `:80`, оставьте `FRONTEND_PORT=8080` и проксируйте с хоста:
+После смены `VITE_API_URL` или портов пересоберите frontend: `docker compose -f docker-compose.prod.yml up -d --build`.
 
-```nginx
-location /excel/ {
-    proxy_pass http://127.0.0.1:8080/;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-}
+### Nginx на сервере (домен)
+
+Готовый конфиг: `deploy/nginx/excel-transformer.djazavi.ru.conf`
+
+```bash
+sudo cp deploy/nginx/excel-transformer.djazavi.ru.conf /etc/nginx/sites-available/
+sudo ln -sf /etc/nginx/sites-available/excel-transformer.djazavi.ru.conf /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+
+# HTTPS
+sudo certbot --nginx -d excel-transformer.djazavi.ru
 ```
 
-После смены `VITE_API_URL` или портов пересоберите frontend: `docker compose -f docker-compose.prod.yml up -d --build`.
+Пример `.env` для этого домена: `deploy/nginx/.env.production`
+
+| Переменная | Значение |
+|------------|----------|
+| `APP_URL` | `http://excel-transformer.djazavi.ru` (после certbot — `https://...`) |
+| `FRONTEND_PORT` | `8082` |
+| `BACKEND_PORT` | `8001` |
+| `VITE_API_URL` | `/api` |
 
 Обновление после push:
 

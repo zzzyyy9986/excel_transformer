@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { QueryService } from '../services/QueryService';
-import type { OrderPayload, ParsedForm, TemplateInfo } from '../types/api';
+import type { OrderListItem, OrderPayload, ParsedForm, TemplateInfo } from '../types/api';
 
 export class TemplateStore {
   template: TemplateInfo | null = null;
@@ -8,12 +8,13 @@ export class TemplateStore {
   loading = false;
   uploading = false;
   submitting = false;
+  ordersLoading = false;
+  orders: OrderListItem[] = [];
   error: string | null = null;
   successMessage: string | null = null;
 
   selectedTierIndex = 0;
   quantities: Record<number, number> = {};
-  clientName = '';
   clientEmail = '';
   comment = '';
 
@@ -135,7 +136,6 @@ export class TemplateStore {
     const payload: OrderPayload = {
       tier_index: this.selectedTierIndex,
       tier_name: tier.name,
-      client_name: this.clientName || undefined,
       client_email: this.clientEmail || undefined,
       comment: this.comment || undefined,
       items,
@@ -148,10 +148,12 @@ export class TemplateStore {
     try {
       const response = await QueryService.submitOrder(payload);
       runInAction(() => {
-        this.successMessage = `${response.message} Сумма: ${response.order.total_amount.toFixed(2)} ₽`;
+        this.successMessage = `${response.message} Сумма: ${Number(response.order.total_amount).toFixed(2)} ₽`;
         this.quantities = {};
         this.comment = '';
+        this.clientEmail = '';
       });
+      void this.loadOrders();
       return true;
     } catch {
       runInAction(() => {
@@ -161,6 +163,25 @@ export class TemplateStore {
     } finally {
       runInAction(() => {
         this.submitting = false;
+      });
+    }
+  }
+
+  public async loadOrders(): Promise<void> {
+    this.ordersLoading = true;
+
+    try {
+      const data = await QueryService.getOrders();
+      runInAction(() => {
+        this.orders = data.orders;
+      });
+    } catch {
+      runInAction(() => {
+        this.error = 'Не удалось загрузить заказы.';
+      });
+    } finally {
+      runInAction(() => {
+        this.ordersLoading = false;
       });
     }
   }

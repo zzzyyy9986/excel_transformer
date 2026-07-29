@@ -11,7 +11,6 @@ class OrderService
      * @param array{
      *     tier_index: int,
      *     tier_name: string,
-     *     client_name?: string,
      *     client_email?: string,
      *     comment?: string,
      *     items: list<array{
@@ -37,7 +36,6 @@ class OrderService
             'excel_template_id' => $template->id,
             'tier_index' => $payload['tier_index'],
             'tier_name' => $payload['tier_name'],
-            'client_name' => $payload['client_name'] ?? null,
             'client_email' => $payload['client_email'] ?? null,
             'comment' => $payload['comment'] ?? null,
             'items' => $items,

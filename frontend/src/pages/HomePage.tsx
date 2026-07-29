@@ -1,10 +1,11 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import { OrderFormTab } from './OrderFormTab';
+import { OrdersTab } from './OrdersTab';
 import { UploadTab } from './UploadTab';
 import { templateStore } from '../store/TemplateStore';
 
-type TabId = 'upload' | 'order';
+type TabId = 'upload' | 'order' | 'orders';
 
 export const HomePage = observer(function HomePage() {
   const [activeTab, setActiveTab] = useState<TabId>('upload');
@@ -54,6 +55,15 @@ export const HomePage = observer(function HomePage() {
             Заказ по шаблону
           </button>
         </li>
+        <li className="nav-item">
+          <button
+            type="button"
+            className={`nav-link ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orders')}
+          >
+            Заказы
+          </button>
+        </li>
       </ul>
 
       {templateStore.loading ? (
@@ -63,7 +73,10 @@ export const HomePage = observer(function HomePage() {
           {activeTab === 'upload' && (
             <UploadTab onUploaded={() => setActiveTab('order')} />
           )}
-          {activeTab === 'order' && <OrderFormTab />}
+          {activeTab === 'order' && (
+            <OrderFormTab onSubmitted={() => setActiveTab('orders')} />
+          )}
+          {activeTab === 'orders' && <OrdersTab />}
         </>
       )}
     </div>

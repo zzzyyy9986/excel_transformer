@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { OrderPayload, OrderResponse, TemplateResponse } from '../types/api';
+import type { OrderListItem, OrderPayload, OrderResponse, TemplateResponse } from '../types/api';
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -27,6 +27,11 @@ export class QueryService {
 
   public static async submitOrder(payload: OrderPayload): Promise<OrderResponse> {
     const response = await client.post<OrderResponse>('/orders', payload);
+    return response.data;
+  }
+
+  public static async getOrders(): Promise<{ orders: OrderListItem[] }> {
+    const response = await client.get<{ orders: OrderListItem[] }>('/orders');
     return response.data;
   }
 }

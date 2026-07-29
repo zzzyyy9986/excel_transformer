@@ -3,7 +3,11 @@ import type { FormEvent } from 'react';
 import type { ProductGroup } from '../types/api';
 import { templateStore } from '../store/TemplateStore';
 
-export const OrderFormTab = observer(function OrderFormTab() {
+export const OrderFormTab = observer(function OrderFormTab({
+  onSubmitted,
+}: {
+  onSubmitted?: () => void;
+}) {
   const { form, template } = templateStore;
 
   if (!template || !form) {
@@ -16,7 +20,10 @@ export const OrderFormTab = observer(function OrderFormTab() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    await templateStore.submitOrder();
+    const ok = await templateStore.submitOrder();
+    if (ok) {
+      onSubmitted?.();
+    }
   };
 
   return (
@@ -82,7 +89,7 @@ export const OrderFormTab = observer(function OrderFormTab() {
         <div className="row g-3">
           <div className="col-md-6">
             <label className="form-label" htmlFor="order-comment">
-              Комментарий:
+              Комментарий
             </label>
             <textarea
               id="order-comment"
@@ -94,27 +101,15 @@ export const OrderFormTab = observer(function OrderFormTab() {
               }}
             />
           </div>
-          <div className="col-md-3">
-            <label className="form-label" htmlFor="client-name">
-              Клиент
+          <div className="col-md-6">
+            <label className="form-label" htmlFor="client-contact">
+              Как с вами связаться?
             </label>
             <input
-              id="client-name"
+              id="client-contact"
+              type="text"
               className="form-control"
-              value={templateStore.clientName}
-              onChange={(event) => {
-                templateStore.clientName = event.target.value;
-              }}
-            />
-          </div>
-          <div className="col-md-3">
-            <label className="form-label" htmlFor="client-email">
-              Email
-            </label>
-            <input
-              id="client-email"
-              type="email"
-              className="form-control"
+              placeholder="Email, телефон или Telegram"
               value={templateStore.clientEmail}
               onChange={(event) => {
                 templateStore.clientEmail = event.target.value;

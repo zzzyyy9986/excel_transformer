@@ -26,8 +26,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'tier_index' => ['required', 'integer', 'min:0'],
             'tier_name' => ['required', 'string', 'max:255'],
-            'client_name' => ['nullable', 'string', 'max:255'],
-            'client_email' => ['nullable', 'email', 'max:255'],
+            'client_email' => ['nullable', 'string', 'max:255'],
             'comment' => ['nullable', 'string', 'max:2000'],
             'items' => ['required', 'array'],
             'items.*.row_index' => ['required', 'integer'],
@@ -58,7 +57,7 @@ class OrderController extends Controller
             ->first()?->orders()
             ->latest()
             ->limit(20)
-            ->get(['id', 'tier_name', 'client_name', 'total_amount', 'created_at']);
+            ->get(['id', 'tier_name', 'client_email', 'comment', 'items', 'total_amount', 'created_at']);
 
         return response()->json(['orders' => $orders ?? collect()]);
     }
