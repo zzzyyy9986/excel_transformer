@@ -43,39 +43,3 @@ export interface TemplateResponse {
   template: TemplateInfo | null;
   form: ParsedForm | null;
 }
-
-export interface OrderItemPayload {
-  row_index: number;
-  model: string;
-  size: string;
-  color: string;
-  quantity: number;
-  unit_price: number;
-}
-
-export interface OrderPayload {
-  tier_index: number;
-  tier_name: string;
-  client_email?: string;
-  comment?: string;
-  items: OrderItemPayload[];
-}
-
-export interface OrderListItem {
-  id: number;
-  tier_name: string | null;
-  client_email: string | null;
-  comment: string | null;
-  items: OrderItemPayload[];
-  total_amount: number;
-  created_at: string;
-}
-
-export interface OrderResponse {
-  message: string;
-  order: {
-    id: number;
-    total_amount: number;
-    items_count: number;
-  };
-}

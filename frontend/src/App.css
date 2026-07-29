@@ -134,22 +134,3 @@ body {
     min-width: 180px;
   }
 }
-
-.orders-tab__comment {
-  max-width: 240px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.orders-tab__details {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-}
-
-.orders-tab__summary {
-  cursor: pointer;
-  font-weight: 500;
-  user-select: none;
-}

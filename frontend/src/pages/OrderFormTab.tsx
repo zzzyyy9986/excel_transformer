@@ -3,11 +3,7 @@ import type { FormEvent } from 'react';
 import type { ProductGroup } from '../types/api';
 import { templateStore } from '../store/TemplateStore';
 
-export const OrderFormTab = observer(function OrderFormTab({
-  onSubmitted,
-}: {
-  onSubmitted?: () => void;
-}) {
+export const OrderFormTab = observer(function OrderFormTab() {
   const { form, template } = templateStore;
 
   if (!template || !form) {
@@ -18,16 +14,13 @@ export const OrderFormTab = observer(function OrderFormTab({
     );
   }
 
-  const handleSubmit = async (event: FormEvent) => {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    const ok = await templateStore.submitOrder();
-    if (ok) {
-      onSubmitted?.();
-    }
+    alert('Пока заказ не отправляется');
   };
 
   return (
-    <form onSubmit={(event) => void handleSubmit(event)} className="order-form">
+    <form onSubmit={handleSubmit} className="order-form">
       <p className="order-form__instruction">
         1, заполните необходимые ячейки для заказа и нажмите «Отправить заказ»
       </p>
@@ -122,8 +115,8 @@ export const OrderFormTab = observer(function OrderFormTab({
           <div className="order-form__footer-sum">
             Сумма заказа: <strong>{templateStore.orderTotal.toFixed(2)}</strong>
           </div>
-          <button type="submit" className="btn btn-primary btn-lg px-5" disabled={templateStore.submitting}>
-            {templateStore.submitting ? 'Отправка…' : 'Отправить заказ'}
+          <button type="submit" className="btn btn-primary btn-lg px-5">
+            Отправить заказ
           </button>
         </div>
       </div>

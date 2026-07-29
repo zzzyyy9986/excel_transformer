@@ -1,15 +1,12 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import { QueryService } from '../services/QueryService';
-import type { OrderListItem, OrderPayload, ParsedForm, TemplateInfo } from '../types/api';
+import type { ParsedForm, TemplateInfo } from '../types/api';
 
 export class TemplateStore {
   template: TemplateInfo | null = null;
   form: ParsedForm | null = null;
   loading = false;
   uploading = false;
-  submitting = false;
-  ordersLoading = false;
-  orders: OrderListItem[] = [];
   error: string | null = null;
   successMessage: string | null = null;
 
@@ -106,84 +103,6 @@ export class TemplateStore {
         return rowSum + qty * this.getUnitPrice(row);
       }, 0);
     }, 0);
-  }
-
-  public async submitOrder(): Promise<boolean> {
-    if (!this.form) {
-      this.error = 'Нет активного шаблона.';
-      return false;
-    }
-
-    const tier = this.form.tiers[this.selectedTierIndex];
-    const items = this.form.groups.flatMap((group) =>
-      group.rows
-        .map((row) => ({
-          row_index: row.row_index,
-          model: row.model,
-          size: row.size,
-          color: row.color,
-          quantity: this.quantities[row.row_index] ?? 0,
-          unit_price: this.getUnitPrice(row),
-        }))
-        .filter((item) => item.quantity > 0),
-    );
-
-    if (items.length === 0) {
-      this.error = 'Укажите количество хотя бы для одной позиции.';
-      return false;
-    }
-
-    const payload: OrderPayload = {
-      tier_index: this.selectedTierIndex,
-      tier_name: tier.name,
-      client_email: this.clientEmail || undefined,
-      comment: this.comment || undefined,
-      items,
-    };
-
-    this.submitting = true;
-    this.error = null;
-    this.successMessage = null;
-
-    try {
-      const response = await QueryService.submitOrder(payload);
-      runInAction(() => {
-        this.successMessage = `${response.message} Сумма: ${Number(response.order.total_amount).toFixed(2)} ₽`;
-        this.quantities = {};
-        this.comment = '';
-        this.clientEmail = '';
-      });
-      void this.loadOrders();
-      return true;
-    } catch {
-      runInAction(() => {
-        this.error = 'Не удалось отправить заказ.';
-      });
-      return false;
-    } finally {
-      runInAction(() => {
-        this.submitting = false;
-      });
-    }
-  }
-
-  public async loadOrders(): Promise<void> {
-    this.ordersLoading = true;
-
-    try {
-      const data = await QueryService.getOrders();
-      runInAction(() => {
-        this.orders = data.orders;
-      });
-    } catch {
-      runInAction(() => {
-        this.error = 'Не удалось загрузить заказы.';
-      });
-    } finally {
-      runInAction(() => {
-        this.ordersLoading = false;
-      });
-    }
   }
 
   private applyTemplateData(data: { template: TemplateInfo | null; form: ParsedForm | null }): void {
